@@ -12,8 +12,8 @@ def monte_carlo(n, k):
 
         if (i + 1) % k == 0:
             print("Krok", i + 1, "wartość:", licznik / (i + 1) * 4)
-    pi = licznik / n * 4
-    print("Wartość po", n, "krokach:", pi, "błąd:", abs(math.pi - pi))
+    przyblizenie_pi = licznik / n * 4
+    print("Wartość po", n, "krokach:", przyblizenie_pi, "błąd:", abs(math.pi - przyblizenie_pi))
 
 
 monte_carlo(int(input("Podaj liczbę iteracji: ")), int(input("Podaj krok: ")))
