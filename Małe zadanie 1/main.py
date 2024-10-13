@@ -12,6 +12,7 @@ def pi_monte_carlo(n, k):
 
         if (i + 1) % k == 0:
             print("Krok", i + 1, "wartość:", in_cnt / (i + 1) * 4)
+
     estimated_pi = in_cnt / n * 4
     print("Wartość po", n, "krokach:", estimated_pi, "błąd:", abs(math.pi - estimated_pi))
 
