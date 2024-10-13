@@ -22,8 +22,7 @@ def pokaz_czas():
     if nazwa not in aktywnosci.keys():
         print("Niepoprawna nazwa")
     else:
-        czas = sumuj_czas(nazwa)
-        print("Całkowity czas:", czas)
+        print("Całkowity czas:", sumuj_czas(nazwa))
 
 
 def pokaz_top():
