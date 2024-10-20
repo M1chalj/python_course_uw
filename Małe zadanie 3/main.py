@@ -1,3 +1,103 @@
-print("xz")
-print("xy")
-print("J")
+import argparse
+
+
+def wczytaj_argumenty():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-miesiace",
+                        help="lista miesięcy",
+                        nargs='+',
+                        required=True)
+    parser.add_argument("-dni",
+                        help="lista dni lub przedziałów dla każdego miesiąca np. pn-wt, pt",
+                        nargs='+',
+                        required=True)
+    parser.add_argument("-pory",
+                        help="pory dnia (rano(r)/wieczór(w)) dla każdej kombinacji miesiąc - dzień. Domyślnie rano",
+                        nargs='+',
+                        required=True)
+    parser.add_argument("-t",
+                        help="tworzenie plików (domyślnie pliki są odczytywane)",
+                        action="store_const",
+                        const="t",
+                        default="o",
+                        dest="tryb")
+    parser.add_argument("-j",
+                        help="przetwarza pliki o rozszerzeniu json",
+                        action="store_true",
+                        dest="json")
+    parser.add_argument("-c",
+                        help="przetwarza pliki o rozszerzeniu csv",
+                        action="store_true",
+                        dest="csv")
+    args = parser.parse_args()
+
+    if not args.json and not args.csv:
+        parser.print_help()
+        print("Nie podano żadnego formatu plików")
+        exit()
+
+    if len(args.miesiace) != len(args.dni):
+        parser.print_help()
+        print("Liczba miesięcy i dni jest różna")
+        exit()
+
+    return args
+
+
+dni_tygodnia_skroty = {
+    "pn": 0,
+    "wt": 1,
+    "sr": 2,
+    "cz": 3,
+    "pt": 4,
+    "sb": 5,
+    "nd": 6
+}
+
+dni_tygodnia_nazwy = {
+    0: "poniedziałek",
+    1: "wtorek",
+    2: "środa",
+    3: "czwartek",
+    4: "piątek",
+    5: "sobota",
+    6: "niedziela"
+}
+
+
+def daj_liste_dni(zakres):
+    wynik = []
+    if '-' in zakres:
+        lista = zakres.split('-')
+        if len(lista) != 2 or lista[0] not in dni_tygodnia_skroty or lista[1] not in dni_tygodnia_skroty:
+            print("niepoprawny zakres dni tygodnia")
+            exit()
+
+        for i in range(dni_tygodnia_skroty[lista[0]], dni_tygodnia_skroty[lista[1]] + 1):
+            wynik.append(dni_tygodnia_nazwy[i])
+
+    else:
+        if zakres in dni_tygodnia_skroty:
+            wynik.append(dni_tygodnia_nazwy[dni_tygodnia_skroty[zakres]])
+        else:
+            print("niepoprawny zakres dni tygodnia")
+            exit()
+    return wynik
+
+
+def przetworz_listy(miesiace, dni, pory):
+    skladowe_sciezek = []
+    indeks_pora = 0
+    for i in range(len(miesiace)):
+        lista_dni = daj_liste_dni(dni[i])
+        for dzien in lista_dni:
+            if indeks_pora < len(pory):
+                if pory[indeks_pora] == 'r':
+                    pora = 'rano'
+                else:
+                    pora = 'wieczorem'
+            else:
+                pora = 'rano'
+            skladowe_sciezek.append([miesiace[i], dzien, pora])
+            indeks_pora += 1
+    return skladowe_sciezek
