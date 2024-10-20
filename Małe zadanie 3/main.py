@@ -1,6 +1,9 @@
 import argparse
+import random
 from pathlib import Path
 import os
+import csv
+import json
 
 
 def wczytaj_argumenty():
@@ -104,7 +107,8 @@ def przetworz_listy(miesiace, dni, pory):
             indeks_pora += 1
     return skladowe_sciezek
 
-def zrob_sciezki(skladowe_sciezek, json, csv):
+
+def zrob_sciezki(skladowe_sciezek):
     sciezki = []
     for skladowa in skladowe_sciezek:
         sciezka = os.getcwd()
@@ -112,15 +116,79 @@ def zrob_sciezki(skladowe_sciezek, json, csv):
             sciezka = os.path.join(sciezka, folder)
             if not Path(sciezka).exists():
                 os.mkdir(sciezka)
-        if json:
-            sciezki.append(os.path.join(sciezka, "Dane.json"))
-        if csv:
-            sciezki.append(os.path.join(sciezka, "Dane.csv"))
+        sciezki.append(sciezka)
 
     return sciezki
 
+
+modele = ["A", "B", "C"]
+
+
+def zapis_do_csv(sciezki):
+    for sciezka in sciezki:
+        dane = [["Model", "Wynik", "Czas"],
+                [random.choice(modele), random.randint(0, 1000), str(random.randint(0, 1000)) + "s"]]
+        with open(os.path.join(sciezka, 'Dane.csv'), 'w', newline='') as plik:
+            pisarz = csv.writer(plik, delimiter=';')
+            for wiersz in dane:
+                pisarz.writerow(wiersz)
+
+
+def zapis_do_json(sciezki):
+    for sciezka in sciezki:
+        dane = {"Model": random.choice(modele),
+                "Wynik": random.randint(0, 1000),
+                "Czas": str(random.randint(0, 1000)) + "s"}
+        with open(os.path.join(sciezka, 'Dane.json'), 'w') as plik:
+            json.dump(dane, plik)
+
+
+def odczyt_z_csv(sciezki, model):
+    suma = 0
+    for sciezka in sciezki:
+
+        sciezka_do_pliku = os.path.join(sciezka, 'Dane.csv')
+        if not Path(sciezka_do_pliku).exists():
+            continue
+
+        with open(sciezka_do_pliku, 'r') as plik:
+            czytelnik = csv.reader(plik, delimiter=';')
+            naglowki = next(czytelnik)
+            if "Model" not in naglowki or "Czas" not in naglowki:
+                print("Błędny plik", os.path.join(sciezka, 'Dane.csv'))
+                continue
+            kolumnaModel = naglowki.index("Model")
+            kolumnaCzas = naglowki.index("Czas")
+            for wiersz in czytelnik:
+                if wiersz[kolumnaModel] == model:
+                    suma += int(wiersz[kolumnaCzas][:-1])
+    return suma
+
+
+def odczyt_z_json(sciezki, model):
+    suma = 0
+    for sciezka in sciezki:
+        sciezka_do_pliku = os.path.join(sciezka, 'Dane.json')
+        if not Path(sciezka_do_pliku).exists():
+            continue
+        with open(sciezka_do_pliku, 'r') as plik:
+            dane = json.load(plik)
+            if (dane["Model"] == model):
+                suma += int(dane["Czas"][:-1])
+    return suma
+
+
 args = wczytaj_argumenty()
-sciezki = zrob_sciezki(przetworz_listy(args.miesiace, args.dni, args.pory), args.json, args.csv)
-
-
-
+sciezki = zrob_sciezki(przetworz_listy(args.miesiace, args.dni, args.pory))
+if args.tryb == 't':
+    if args.json:
+        zapis_do_json(sciezki)
+    if args.csv:
+        zapis_do_csv(sciezki)
+else:
+    suma = 0
+    if args.json:
+        suma += odczyt_z_json(sciezki, "A")
+    if args.csv:
+        suma += odczyt_z_csv(sciezki, "A")
+    print("Suma czasów:", suma)
