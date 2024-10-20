@@ -30,9 +30,9 @@ pory_dnia_nazwy = {
     'w': 'wieczorem'
 }
 
-modele = ['A', 'B', 'C']
-
 domyslna_pora_dnia = 'rano'
+
+modele = ['A', 'B', 'C']
 
 
 def wczytaj_argumenty():
@@ -78,6 +78,10 @@ def wczytaj_argumenty():
     return args
 
 
+#dostaje zakres, zwraca listę dni tygodnia w tym zakresie
+#np.:
+#zakres = 'pn' -> ['poniedziałek']
+#zakres = 'wt-cz' -> ['wtorek', 'środa', 'czwartek']
 def daj_liste_dni(zakres):
     wynik = []
     if '-' in zakres:
@@ -98,26 +102,28 @@ def daj_liste_dni(zakres):
     return wynik
 
 
-def przetworz_listy(miesiace, dni, pory):
+#otrzumuje listy miesięcy, dni i pór dnia (podane w argumentach wywołania)
+#zwraca listę trójek [miesiąc, dzień, pora dnia]
+def generuj_skladowe_sciezek(miesiace, dni, pory_dnia):
     skladowe_sciezek = []
-    indeks_pora = 0
+    id_pory_dnia = 0
     for i in range(len(miesiace)):
         lista_dni = daj_liste_dni(dni[i])
         for dzien in lista_dni:
-            if indeks_pora < len(pory):
-                if not pory[indeks_pora] in pory_dnia_nazwy:
+            if id_pory_dnia < len(pory_dnia):
+                if not pory_dnia[id_pory_dnia] in pory_dnia_nazwy:
                     print('niepoprawna pora')
                     exit()
                 else:
-                    pora = pory_dnia_nazwy[pory[indeks_pora]]
+                    pora_dnia = pory_dnia_nazwy[pory_dnia[id_pory_dnia]]
             else:
-                pora = domyslna_pora_dnia
-            skladowe_sciezek.append([miesiace[i], dzien, pora])
-            indeks_pora += 1
+                pora_dnia = domyslna_pora_dnia
+            skladowe_sciezek.append([miesiace[i], dzien, pora_dnia])
+            id_pory_dnia += 1
     return skladowe_sciezek
 
 
-def zrob_sciezki(skladowe_sciezek):
+def generuj_sciezki(skladowe_sciezek):
     sciezki = []
     for skladowa in skladowe_sciezek:
         sciezka = os.getcwd()
@@ -188,7 +194,7 @@ def odczyt_z_json(sciezki, model):
 
 
 args = wczytaj_argumenty()
-sciezki = zrob_sciezki(przetworz_listy(args.miesiace, args.dni, args.pory))
+sciezki = generuj_sciezki(generuj_skladowe_sciezek(args.miesiace, args.dni, args.pory))
 if args.tryb == 't':
     if args.json:
         zapis_do_json(sciezki)
