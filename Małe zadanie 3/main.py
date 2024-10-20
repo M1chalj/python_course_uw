@@ -1,4 +1,6 @@
 import argparse
+from pathlib import Path
+import os
 
 
 def wczytaj_argumenty():
@@ -101,3 +103,24 @@ def przetworz_listy(miesiace, dni, pory):
             skladowe_sciezek.append([miesiace[i], dzien, pora])
             indeks_pora += 1
     return skladowe_sciezek
+
+def zrob_sciezki(skladowe_sciezek, json, csv):
+    sciezki = []
+    for skladowa in skladowe_sciezek:
+        sciezka = os.getcwd()
+        for folder in skladowa:
+            sciezka = os.path.join(sciezka, folder)
+            if not Path(sciezka).exists():
+                os.mkdir(sciezka)
+        if json:
+            sciezki.append(os.path.join(sciezka, "Dane.json"))
+        if csv:
+            sciezki.append(os.path.join(sciezka, "Dane.csv"))
+
+    return sciezki
+
+args = wczytaj_argumenty()
+sciezki = zrob_sciezki(przetworz_listy(args.miesiace, args.dni, args.pory), args.json, args.csv)
+
+
+
