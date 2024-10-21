@@ -120,7 +120,7 @@ def generuj_skladowe_sciezek(miesiace, dni, pory_dnia):
 
         for dzien in lista_dni:
             if id_pory_dnia < len(pory_dnia):
-                if not pory_dnia[id_pory_dnia] in pory_dnia_nazwy:
+                if pory_dnia[id_pory_dnia] not in pory_dnia_nazwy:
                     print('niepoprawna pora dnia')
                     exit()
                 else:
@@ -209,7 +209,7 @@ def odczyt_z_json(sciezki, model):
                 print('Błędny plik', sciezka_do_pliku)
                 continue
 
-            if (dane['Model'] == model):
+            if dane['Model'] == model:
                 suma += int(dane['Czas'][:-1])
 
     return suma
