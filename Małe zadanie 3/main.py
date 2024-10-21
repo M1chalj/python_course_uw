@@ -205,7 +205,7 @@ def odczyt_z_json(sciezki, model):
         with open(sciezka_do_pliku, 'r') as plik:
             dane = json.load(plik)
 
-            if not ('Model' in dane or 'Czas' in dane):
+            if 'Model' not in dane or 'Czas' not in dane:
                 print('Błędny plik', sciezka_do_pliku)
                 continue
 
