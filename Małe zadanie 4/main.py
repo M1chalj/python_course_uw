@@ -1,3 +1,4 @@
+import argparse
 import json
 import os
 from pathlib import Path
@@ -36,8 +37,13 @@ def count_exercises(jupyter_file):
         lambda cell: cell['cell_type'] == 'markdown' and len(cell['source']) > 0 and '# Ćwiczenie' in cell['source'][0],
         cells))
 
+def filename_from_arg():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('filename',
+                        help='name of file (without extension)')
+    return parser.parse_args().filename
 
-filename = input("Podaj nazwę pliku (bez rozszerzenia):")
+filename = filename_from_arg()
 path_to_file = os.path.join(os.getcwd(), filename)
 path_to_jupyter_file = path_to_file + JUPYTER_FILE_EXTENSION
 path_to_python_file = path_to_file + PYTHON_FILE_EXTENSION
