@@ -13,7 +13,7 @@ def get_announcements():
         announcements.append({
             "Name": announcement.find("h3").text,
             "Date": announcement.find(class_ = "info-item-text-date").text,
-            "Link": mimuw_url + announcement.find(class_="more").find("a")["href"],
+            # "Link": mimuw_url + announcement.find(class_="more").find("a")["href"],
         })
     return announcements
 
