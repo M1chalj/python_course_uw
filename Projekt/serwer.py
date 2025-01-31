@@ -3,11 +3,6 @@ from pydantic import BaseModel
 import pandas as pd
 from bs4 import BeautifulSoup
 
-app = FastAPI()
-
-class DrugIDRequest(BaseModel):
-    drug_id: str
-
 def import_database_from_xml(file):
     with open(file) as f:
         drugbank_file = f.read()
@@ -32,6 +27,11 @@ def create_drugs_pathways_dataframe(data):
     return pd.DataFrame(pathways_drugs)
 
 pathways_df = create_drugs_pathways_dataframe(import_database_from_xml('drugbank_partial.xml'))
+
+app = FastAPI()
+
+class DrugIDRequest(BaseModel):
+    drug_id: str
 
 @app.post("/get_pathways_count/")
 def get_pathways_count(request: DrugIDRequest):
